@@ -3,7 +3,12 @@ pipeline {
 
     environment {
     CI = 'true'
+
     BASE_URL = 'https://www.saucedemo.com'
+
+    APP_USERNAME = 'standard_user'
+    APP_PASSWORD = 'secret_sauce'
+
     HEADLESS = 'true'
 }
 

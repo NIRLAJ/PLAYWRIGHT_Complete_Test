@@ -31,11 +31,11 @@ export class LoginPage extends BasePage {
      * Login using credentials from .env
      */
     async loginWithDefaultUser(): Promise<void> {
-        await this.login(
-            process.env.APP_USERNAME!,
-            process.env.APP_PASSWORD!
-        );
-    }
+    await this.login(
+        process.env.APP_USERNAME || 'standard_user',
+        process.env.APP_PASSWORD || 'secret_sauce'
+    );
+}
 
     /**
      * Get login error message
