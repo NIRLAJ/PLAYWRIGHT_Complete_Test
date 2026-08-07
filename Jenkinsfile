@@ -1,9 +1,7 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'Node24'
-    }
+    
 
     environment {
         CI = 'true'
