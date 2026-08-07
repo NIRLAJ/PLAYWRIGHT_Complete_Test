@@ -31,14 +31,10 @@ export default defineConfig({
 ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-  baseURL: process.env.BASE_URL,
-
+  baseURL: process.env.BASE_URL || 'https://www.saucedemo.com',
   headless: process.env.HEADLESS === 'true',
-
   screenshot: 'only-on-failure',
-
   video: 'retain-on-failure',
-
   trace: 'retain-on-failure',
 },
 

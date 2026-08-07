@@ -2,8 +2,10 @@ pipeline {
     agent any
 
     environment {
-        CI = 'true'
-    }
+    CI = 'true'
+    BASE_URL = 'https://www.saucedemo.com'
+    HEADLESS = 'true'
+}
 
     options {
         timestamps()
