@@ -5,7 +5,9 @@ pipeline {
         CI = 'true'
     }
 
-    
+    options {
+        timestamps()
+    }
 
     stages {
 
@@ -35,7 +37,7 @@ pipeline {
 
         stage('Install Playwright Browsers') {
             steps {
-                sh 'npx playwright install'
+                sh 'npx playwright install chromium'
             }
         }
 
@@ -66,7 +68,6 @@ pipeline {
 
     post {
         always {
-
             junit allowEmptyResults: true,
                   testResults: 'test-results/*.xml'
 
@@ -88,11 +89,11 @@ pipeline {
         }
 
         success {
-            echo '✅ Playwright Pipeline completed successfully!'
+            echo 'Playwright Pipeline completed successfully!'
         }
 
         failure {
-            echo '❌ Playwright Pipeline failed.'
+            echo 'Playwright Pipeline failed.'
         }
     }
 }
