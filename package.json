@@ -1,0 +1,45 @@
+{
+  "name": "ai-qa-framework",
+  "version": "1.0.0",
+  "description": "AI-augmented Playwright + TypeScript test automation framework for saucedemo.com, integrated with the Playwright MCP server for AI-driven exploratory testing and test generation.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:smoke": "playwright test apps/automation/tests/smoke",
+    "test:regression": "playwright test apps/automation/tests/regression",
+    "test:api": "playwright test apps/automation/tests/api",
+    "test:ai": "playwright test apps/automation/tests/ai",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen https://www.saucedemo.com",
+    "mcp:playwright": "npx @playwright/mcp@latest",
+    "install:browsers": "playwright install --with-deps",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "typescript",
+    "automation",
+    "ai",
+    "mcp",
+    "saucedemo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@playwright/mcp": "^0.0.41",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^17.4.2"
+  }
+}

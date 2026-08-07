@@ -1,0 +1,18 @@
+# Node
+node_modules/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Env
+.env
+
+# Build
+dist/
+
+# AI debug artifacts (screenshots sent to the AI, raw responses)
+apps/automation/ai-artifacts/

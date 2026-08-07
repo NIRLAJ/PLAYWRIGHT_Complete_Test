@@ -1,0 +1,69 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  BASE_URL: https://www.saucedemo.com
+  APP_USERNAME: standard_user
+  APP_PASSWORD: secret_sauce
+  HEADLESS: 'true'
+
+jobs:
+  ui-and-api-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Type-check
+        run: npm run typecheck
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run smoke tests
+        run: npm run test:smoke
+      - name: Run regression tests
+        run: npm run test:regression
+      - name: Run API tests
+        run: npm run test:api
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  ai-assertion-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    # AI tests hit the Gemini API and consume free-tier quota per run, so they're kept
+    # in a separate job that's allowed to fail without blocking the pipeline,
+    # and only runs when an API key secret is actually configured.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run AI-assertion tests
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run test:ai
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-ai
+          path: playwright-report/
+          retention-days: 30
