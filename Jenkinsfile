@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        CI = "true"
+        CI = 'true'
     }
 
     stages {
@@ -35,44 +35,43 @@ pipeline {
             }
         }
 
-        stage('Smoke Tests') {
-            steps {
-                sh 'npm run test:smoke'
-            }
-        }
+        stage('Run Tests') {
+            parallel {
 
-        stage('Regression Tests') {
-            steps {
-                sh 'npm run test:regression'
-            }
-        }
+                stage('Smoke') {
+                    steps {
+                        sh 'npm run test:smoke'
+                    }
+                }
 
-        stage('API Tests') {
-            steps {
-                sh 'npm run test:api'
+                stage('Regression') {
+                    steps {
+                        sh 'npm run test:regression'
+                    }
+                }
+
+                stage('API') {
+                    steps {
+                        sh 'npm run test:api'
+                    }
+                }
             }
         }
 
         stage('AI Tests') {
             when {
-                environment name: 'GEMINI_API_KEY', value: ''
-                not {
-                    environment name: 'GEMINI_API_KEY', value: ''
+                expression {
+                    return env.GEMINI_API_KEY?.trim()
                 }
             }
             steps {
                 sh 'npm run test:ai'
             }
         }
-
     }
 
     post {
-
         always {
-
-            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
-
             publishHTML(target: [
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,
@@ -81,14 +80,16 @@ pipeline {
                 reportFiles: 'index.html',
                 reportName: 'Playwright Report'
             ])
+
+            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
         }
 
         success {
-            echo '✅ All tests passed.'
+            echo '✅ Pipeline completed successfully!'
         }
 
         failure {
-            echo '❌ Some tests failed.'
+            echo '❌ Pipeline failed.'
         }
     }
 }
