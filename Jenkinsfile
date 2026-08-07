@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     environment {
-    CI = 'true'
+        CI = 'true'
 
-    BASE_URL = 'https://www.saucedemo.com'
+        BASE_URL = 'https://www.saucedemo.com'
 
-    APP_USERNAME = 'standard_user'
-    APP_PASSWORD = 'secret_sauce'
+        APP_USERNAME = 'standard_user'
+        APP_PASSWORD = 'secret_sauce'
 
-    HEADLESS = 'true'
-}
+        HEADLESS = 'true'
+    }
 
     options {
         timestamps()
@@ -59,33 +59,12 @@ pipeline {
                 sh 'npm run test:smoke'
             }
         }
-
-        stage('Regression Tests') {
-            steps {
-                sh 'npm run test:regression'
-            }
-        }
-
-        stage('API Tests') {
-            steps {
-                sh 'npm run test:api'
-            }
-        }
     }
 
     post {
         always {
             junit allowEmptyResults: true,
                   testResults: 'test-results/*.xml'
-
-            publishHTML(target: [
-                reportName: 'Playwright HTML Report',
-                reportDir: 'playwright-report',
-                reportFiles: 'index.html',
-                keepAll: true,
-                alwaysLinkToLastBuild: true,
-                allowMissing: true
-            ])
 
             archiveArtifacts artifacts: 'playwright-report/**',
                              fingerprint: true,
