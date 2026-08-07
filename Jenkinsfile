@@ -1,10 +1,13 @@
 pipeline {
     agent any
 
-    
-
     environment {
         CI = 'true'
+    }
+
+    options {
+        timestamps()
+        ansiColor('xterm')
     }
 
     stages {
@@ -12,6 +15,18 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Environment Info') {
+            steps {
+                sh '''
+                    echo "===== Environment ====="
+                    node -v
+                    npm -v
+                    git --version
+                    java -version
+                '''
             }
         }
 
@@ -23,7 +38,7 @@ pipeline {
 
         stage('Install Playwright Browsers') {
             steps {
-                sh 'npx playwright install --with-deps'
+                sh 'npx playwright install'
             }
         }
 
@@ -33,61 +48,54 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            parallel {
-
-                stage('Smoke') {
-                    steps {
-                        sh 'npm run test:smoke'
-                    }
-                }
-
-                stage('Regression') {
-                    steps {
-                        sh 'npm run test:regression'
-                    }
-                }
-
-                stage('API') {
-                    steps {
-                        sh 'npm run test:api'
-                    }
-                }
+        stage('Smoke Tests') {
+            steps {
+                sh 'npm run test:smoke'
             }
         }
 
-        stage('AI Tests') {
-            when {
-                expression {
-                    return env.GEMINI_API_KEY?.trim()
-                }
-            }
+        stage('Regression Tests') {
             steps {
-                sh 'npm run test:ai'
+                sh 'npm run test:regression'
+            }
+        }
+
+        stage('API Tests') {
+            steps {
+                sh 'npm run test:api'
             }
         }
     }
 
     post {
         always {
+
+            junit allowEmptyResults: true,
+                  testResults: 'test-results/*.xml'
+
             publishHTML(target: [
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
+                reportName: 'Playwright HTML Report',
                 reportDir: 'playwright-report',
                 reportFiles: 'index.html',
-                reportName: 'Playwright Report'
+                keepAll: true,
+                alwaysLinkToLastBuild: true,
+                allowMissing: true
             ])
 
-            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+            archiveArtifacts artifacts: 'playwright-report/**',
+                             fingerprint: true,
+                             allowEmptyArchive: true
+
+            archiveArtifacts artifacts: 'test-results/**',
+                             allowEmptyArchive: true
         }
 
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo '✅ Playwright Pipeline completed successfully!'
         }
 
         failure {
-            echo '❌ Pipeline failed.'
+            echo '❌ Playwright Pipeline failed.'
         }
     }
 }
